@@ -1,0 +1,476 @@
+<div class="container mt-2">
+
+        <div class="col ">
+            <div class="card">
+                <div class="card-header">Employes</div>
+                <div class="card-body">
+                    <div class=" gap-5">
+
+                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#SaveEmployeModal">Nouveau Employe</button>
+
+                    </div>
+                    <div *ngIf="searchFormGroup">
+                    <form [formGroup]="searchFormGroup" (ngSubmit)="handleSearchEmploye()">
+                        <div class="input-group">
+                            <label class="input-group-text">Employe ID : </label>
+                            <input type="text" formControlName="employeId" class="form-control" >
+                            <button class="btn bg-info" data-bs-toggle="modal" data-bs-target="#GetEmployeModal"> <i class="bi bi-search"></i> </button>
+
+                        </div>
+
+                    </form>
+
+                    </div>
+
+
+
+                    <table class="table">
+
+
+                        <thead >
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Matricule</th>
+                            <th scope="col">Nom</th>
+                            <th scope="col">Prenom</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Departement</th>
+                            <th scope="col">Phone Number</th>
+                            <th scope="col">Plus de Details</th>
+                            <th scope="col">Edit</th>
+                            <th scope="col">Supprimer</th>
+
+                        </tr>
+                        </thead>
+
+                        <tbody>
+
+                        <tr *ngFor="let emp of employes$ | async">
+                            <th scope="row"  >{{emp.id}}</th>
+                            <td >{{emp.matricule}}</td>
+                            <td >{{emp.nom}}</td>
+                            <td >{{emp.prenom}}</td>
+                            <td >{{emp.email}}</td>
+                            <td >{{emp.departement}}</td>
+                            <td >{{emp.phoneNumber}}</td>
+
+                            <td>
+                                <button  type="button"  data-bs-toggle="modal" data-bs-target="#GetEmployeModal" (click)="handleGetEmploye(emp.id)" class="btn btn-outline-dark">
+                                    <i class="bi bi-arrow-right-square"></i>
+
+                                </button>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#UpdateEmployeModal" (click)="handleGetEmploye(emp.id)">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <button  type="button" class="btn btn-outline-danger" (click)="handleDeleteEmploye(emp)" >
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+
+
+
+
+                        </tr>
+
+                        </tbody>
+
+
+
+
+
+                    </table>
+
+
+
+
+                </div>
+
+
+
+            </div>
+        </div>
+
+
+
+</div>
+
+
+<div class="modal fade" id="GetEmployeModal" tabindex="-1" role="dialog" aria-labelledby="GetEmployeModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="GetEmployeModalLabel">Plus de details</h5>
+                <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+
+            </div>
+            <div class="modal-body">
+                <ng-container *ngIf="employeObservable$ | async as employeDetails">
+
+                    <table class="table">
+                        <thead>
+                        <th>ID</th><th>Nom du projet</th><th>Date Debut</th><th>Date Fin</th><th>Montant total</th>
+                        </thead>
+                        <tbody>
+                        <tr *ngFor="let p of employeDetails.projet">
+                            <td><strong>{{p.id}}</strong></td>
+                            <td>{{p.titre}}</td>
+                            <td>{{p.dateDebut | date : 'dd-MM-yyyy:HH-mm-ss'}}</td>
+                            <td>{{p.dateFin | date : 'dd-MM-yyyy:HH-mm-ss'}}</td>
+                            <td class="text-end">{{p.montantTotal  | currency}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </ng-container>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="SaveEmployeModal" tabindex="-1" role="dialog" aria-labelledby="saveEmployeLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="saveDepenseLabel">Nouveau Depense</h5>
+                <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+
+            </div>
+            <div class="modal-body">
+                <form novalidate [formGroup]="AddEmployeFormGroup" (ngSubmit)="handleSaveEmploye()">
+                    <fieldset disabled>
+                        <div class="mb-3">
+                            <label for="disabledTextInput" class="form-label">ID</label>
+                            <input type="text" id="disabledTextInput" class="form-control" placeholder="ID">
+                        </div>
+                    </fieldset>
+
+                    <div class="row">
+                        <div class="container row">
+
+                            <label >Matricule :</label>
+                            <input placeholder="Entrer le matricule" formControlName="matricule" class="form-control" type="text">
+                            <p
+                                    *ngIf="
+                AddEmployeFormGroup.controls['matricule'].touched &&
+                AddEmployeFormGroup.controls['matricule'].errors &&
+                AddEmployeFormGroup.controls['matricule'].errors!['required']
+              "
+                                    class="text-danger"
+                            > Matricule is required
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="container row">
+
+                        <label class="form-label">Nom :</label>
+                        <input type="text" class="form-control" formControlName="nom" placeholder="Entrer le nom" >
+                        <p
+                                *ngIf="
+                AddEmployeFormGroup.controls['nom'].touched &&
+                AddEmployeFormGroup.controls['nom'].errors &&
+                AddEmployeFormGroup.controls['nom'].errors!['required']
+              "
+                                class="text-danger"
+                        >
+                            Nom is required
+                        </p>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="container row">
+                        <label class="form-label">Titre :</label>
+                        <input type="text" class="form-control" formControlName="prenom" placeholder="Entrer le prenom" name="titre">
+                        <p
+                                *ngIf="
+                AddEmployeFormGroup.controls['prenom'].touched &&
+                AddEmployeFormGroup.controls['prenom'].errors &&
+                AddEmployeFormGroup.controls['prenom'].errors!['required']
+              "
+                                class="text-danger"
+                        >
+                            Prenom is required
+                        </p>
+                    </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="container row">
+
+                            <label >Email :</label>
+                            <input formControlName="email" class="form-control" type="email">
+                            <p
+                                    *ngIf="
+                AddEmployeFormGroup.controls['email'].touched &&
+                AddEmployeFormGroup.controls['email'].errors &&
+                AddEmployeFormGroup.controls['email'].errors!['required']
+              "
+                                    class="text-danger"
+                            >
+                                Email is required
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="container row">
+
+                            <label >Phone Number :</label>
+                            <input formControlName="phoneNumber" class="form-control" type="text">
+                            <p
+                                    *ngIf="
+                AddEmployeFormGroup.controls['phoneNumber'].touched &&
+                AddEmployeFormGroup.controls['phoneNumber'].errors &&
+                AddEmployeFormGroup.controls['phoneNumber'].errors!['required']
+              "
+                                    class="text-danger"
+                            >
+                                PhoneNumber is required
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="container row">
+
+                            <label class="form-label">Departement :</label>
+                            <select formControlName="departement">
+
+                                <option *ngFor="let d of departements"
+                                        [value]="d">
+                                    {{d}}
+                                </option>
+                            </select>
+                        </div>
+
+                    </div>
+                    <ng-container *ngIf="deplacements$ | async as dep">
+                        <div class="row">
+                            <div class="container row">
+
+                                <div class="mb-3">
+                                    <label class="form-label">Deplacement :</label>
+                                    <select formControlName="idDeplacement">
+
+                                        <option *ngFor="let d of dep "
+                                                [value]="d.id">
+                                            {{d.id}}
+                                        </option>
+                                    </select>
+
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </ng-container>
+
+                    <ng-container *ngIf="projets$ | async as pr">
+                        <div class="row">
+                            <div class="container row">
+
+                                <div class="mb-3">
+                                    <label class="form-label">Projet :</label>
+                                    <select formControlName="idProjet">
+
+                                        <option *ngFor="let p of pr "
+                                                [value]="p.id">
+                                            {{p.id}}
+                                        </option>
+                                    </select>
+
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </ng-container>
+                    <div class="modal-footer">
+
+                        <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Annuler</button>
+                        <button type="submit" [disabled]="!AddEmployeFormGroup.valid" class="btn btn-primary">Envoyer</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="UpdateEmployeModal" tabindex="-1" role="dialog" aria-labelledby="UpdateEmployeLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="UpdateDepenseLabel">Update Employe</h5>
+                <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+
+            </div>
+            <ng-container  *ngIf="employeObservable$ | async as employeup">
+
+            <div class="modal-body">
+                <form novalidate [formGroup]="UpdateEmployeFormGroup" (ngSubmit)="handleUpdateEmploye(employeup.id)">
+                    <fieldset disabled>
+                        <div class="mb-3">
+                            <label for="disabledTextInput" class="form-label">ID</label>
+                            <input  type="hidden" class="form-control"  formControlName="id"  [(ngModel)]="employeup.id">
+                        </div>
+                    </fieldset>
+
+                    <div class="row">
+                        <div class="container row">
+
+                            <label >Matricule :</label>
+                            <input placeholder="Entrer le matricule"[(ngModel)]="employeup.matricule" formControlName="matricule" class="form-control" type="text">
+                            <p
+                                    *ngIf="
+                AddEmployeFormGroup.controls['matricule'].touched &&
+                AddEmployeFormGroup.controls['matricule'].errors &&
+                AddEmployeFormGroup.controls['matricule'].errors!['required']
+              "
+                                    class="text-danger"
+                            > Matricule is required
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="container row">
+
+                            <label class="form-label">Nom :</label>
+                            <input type="text" class="form-control" [(ngModel)]="employeup.nom" formControlName="nom" placeholder="Entrer le nom" >
+                            <p
+                                    *ngIf="
+                AddEmployeFormGroup.controls['nom'].touched &&
+                AddEmployeFormGroup.controls['nom'].errors &&
+                AddEmployeFormGroup.controls['nom'].errors!['required']
+              "
+                                    class="text-danger"
+                            >
+                                Nom is required
+                            </p>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="container row">
+                            <label class="form-label">Titre :</label>
+                            <input type="text" class="form-control" [(ngModel)]="employeup.prenom"  formControlName="prenom" placeholder="Entrer le prenom" name="titre">
+                            <p
+                                    *ngIf="
+                AddEmployeFormGroup.controls['prenom'].touched &&
+                AddEmployeFormGroup.controls['prenom'].errors &&
+                AddEmployeFormGroup.controls['prenom'].errors!['required']
+              "
+                                    class="text-danger"
+                            >
+                                Prenom is required
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="container row">
+
+                            <label >Email :</label>
+                            <input formControlName="email"[(ngModel)]="employeup.email"  class="form-control" type="email">
+                            <p
+                                    *ngIf="
+                AddEmployeFormGroup.controls['email'].touched &&
+                AddEmployeFormGroup.controls['email'].errors &&
+                AddEmployeFormGroup.controls['email'].errors!['required']
+              "
+                                    class="text-danger"
+                            >
+                                Email is required
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="container row">
+
+                            <label >Phone Number :</label>
+                            <input formControlName="phoneNumber"  [(ngModel)]="employeup.phoneNumber" class="form-control" type="text">
+                            <p
+                                    *ngIf="
+                AddEmployeFormGroup.controls['phoneNumber'].touched &&
+                AddEmployeFormGroup.controls['phoneNumber'].errors &&
+                AddEmployeFormGroup.controls['phoneNumber'].errors!['required']
+              "
+                                    class="text-danger"
+                            >
+                                PhoneNumber is required
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="container row">
+
+                            <label class="form-label">Departement :</label>
+                            <select [(ngModel)]="employeup.departement" formControlName="departement">
+
+                                <option *ngFor="let d of departements"
+                                        [value]="d">
+                                    {{d}}
+                                </option>
+                            </select>
+                        </div>
+
+                    </div>
+                    <ng-container *ngIf="deplacements$ | async as dep">
+                        <div class="row">
+                            <div class="container row">
+
+                                <div class="mb-3">
+                                    <label class="form-label">Deplacement :</label>
+                                    <select  formControlName="idDeplacement">
+
+                                        <option *ngFor="let d of dep "
+                                                [value]="d.id">
+                                            {{d.id}}
+                                        </option>
+                                    </select>
+
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </ng-container>
+
+                    <ng-container *ngIf="projets$ | async as pr">
+                        <div class="row">
+                            <div class="container row">
+
+                                <div class="mb-3">
+                                    <label class="form-label">Projet :</label>
+                                    <select formControlName="idProjet">
+
+                                        <option *ngFor="let p of pr "
+                                                [value]="p.id">
+                                            {{p.id}}
+                                        </option>
+                                    </select>
+
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </ng-container>
+                    <div class="modal-footer">
+
+                        <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Annuler</button>
+                        <button type="submit" [disabled]="!UpdateEmployeFormGroup.valid" class="btn btn-primary">Envoyer</button>
+                    </div>
+                </form>
+            </div>
+            </ng-container>
+
+        </div>
+    </div>
+</div>

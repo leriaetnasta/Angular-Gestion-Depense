@@ -1,0 +1,389 @@
+<div class="container mt-2">
+    <div class="row">
+            <div class="card">
+                <div class="card-header">
+                    Depenses
+                </div>
+                <div class="card-body">
+                    <div class=" gap-5">
+
+                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#SaveDepenseModal">Nouveau Depense</button>
+            
+                        </div>
+                    <div *ngIf="searchFormGroup">
+                        <!--afficher le formulaire seulement si searchformgroup est creée et initialisé!-->
+                        <form [formGroup]="searchFormGroup" (ngSubmit)="handleSearch()" >
+                            <div class="input-group">
+                                <label class="input-group-text">Keyword : </label>
+                                <input type="text" formControlName="keyword" class="form-control">
+                                <button class="btn bg-info"> <i class="bi bi-search"></i> </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <ng-container *ngIf="depenses$ | async; else loadingOrErrorAlert">
+
+
+                    </ng-container>
+
+                    <ng-template #loadingOrErrorAlert>
+                        <ng-container *ngIf="errorObj; else loading">
+
+                        </ng-container>
+
+                        <!-- loading-->
+                        <ng-template #loading>
+                        </ng-template>
+                    </ng-template>
+                    <table class="table">
+
+
+                        <thead >
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Motif</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">montant</th>
+                            <th scope="col">Commentaire</th>
+                            <th scope="col">Mode de Reglement</th>
+                            <th scope="col">Piece Justificative</th>
+                            <th scope="col">Edit</th>
+                            <th scope="col">Supprimer</th>
+                            <th scope="col">Lier Deplacement</th>
+
+                        </tr>
+                        </thead>
+
+
+
+                        <tbody>
+
+                        <tr *ngFor="let d of depenses$ | async">
+                            <th scope="row"  >{{d.id}}</th>
+                            <td >{{d.titre}}</td>
+                            <td [ngStyle]="{'background':getColor(d.status)}" >{{d.status}}</td>
+
+                            <td >{{d.montant}}</td>
+
+                            <td >{{d.commentaire}}</td>
+
+                            <td >{{d.modeReglement}}</td>
+                            <td >
+                            <img style="width: 70px;height: 70px;" src="{{d.pieceJustificative}}" ></td>
+
+                            <td>
+                                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#UpdateDepenseModal" (click)="handleGetDepense(d.id)">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <button  type="button" class="btn btn-outline-danger" (click)="handleDeleteDepense(d)" >
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+
+                            <td>
+                                <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#AddDeplacementToDepenseModal" (click)="handleGetDepense(d.id)" >
+                                    <i class="bi bi-plus-square"></i>
+                                </button>
+                            </td>
+
+
+
+
+                        </tr>
+
+                        </tbody>
+
+
+
+
+
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+<div class="modal fade" id="SaveDepenseModal" tabindex="-1" role="dialog" aria-labelledby="saveDepenseLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="saveDepenseLabel">Nouveau Depense</h5>
+                    <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+
+                </div>
+                <div class="modal-body">
+                <form novalidate [formGroup]="AddDepenseFormGroup" (ngSubmit)="handleSaveDepense()">
+                    <fieldset disabled>
+                        <div class="mb-3">
+                            <label for="disabledTextInput" class="form-label">ID</label>
+                            <input type="text" id="disabledTextInput"  placeholder="ID">
+                        </div>
+                    </fieldset>
+                    <div class="mb-3">
+                        <label class="form-label">Montant :</label>
+                        <input type="number" class="form-control" formControlName="montant" placeholder="Entrer le montant" name="montant">
+                        <p
+                                *ngIf="
+                AddDepenseFormGroup.controls['montant'].touched &&
+                AddDepenseFormGroup.controls['montant'].errors &&
+                AddDepenseFormGroup.controls['montant'].errors!['required']
+              "
+                                class="text-danger"
+                        >
+                            Montant is required
+                        </p>
+                    </div>
+
+
+                    <div class="mb-3">
+                        <label class="form-label">Titre :</label>
+                        <input type="text" class="form-control" formControlName="titre" placeholder="Entrer le titre" name="titre">
+                        <p
+                                *ngIf="
+                AddDepenseFormGroup.controls['titre'].touched &&
+                AddDepenseFormGroup.controls['titre'].errors &&
+                AddDepenseFormGroup.controls['titre'].errors!['required']
+              "
+                                class="text-danger"
+                        >
+                            Titre is required
+                        </p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Commentaire :</label>
+                        <input type="text" class="form-control" formControlName="commentaire" placeholder="Entrer le commentaire" name="commentaire">
+
+                    </div>
+
+                      <!--  <fieldset disabled>
+                            <div class="mb-3">
+                                <label for="disabledSelect" class="form-label">Deplacement : </label>
+                                <select id="disabledSelect" class="form-select">
+                                    <option>Deplacement</option>
+                                </select>
+                            </div>
+                        </fieldset> !-->
+                    <ng-container *ngIf="deplacements$ | async as dep">
+                    <div class="row">
+                        <div class="container row">
+                            <div class="mb-3">
+                                <label class="form-label">Deplacement :</label>
+                                <select formControlName="idDeplacement">
+                                    <option *ngFor="let d of dep "
+                                            [value]="d.id">
+                                        {{d.id}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    </ng-container>
+
+                    <div class="row">
+                        <div class="container row">
+
+                            <label >Piece Justificative</label>
+                            <input formControlName="pieceJustificative" class="form-control" type="text">
+
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Status :</label>
+                        <select formControlName="status">
+
+                            <option *ngFor="let s of statusList"
+                                    [value]="s">
+                                {{s}}
+                            </option>
+                        </select>
+
+
+                    </div>
+
+
+                    <div class="mb-3">
+                        <label class="form-label">Mode de Reglement :</label>
+                        <select formControlName="modeReglement">
+
+                            <option *ngFor="let m of modeReglementlist"
+                                    [value]="m">
+                                {{m}}
+                            </option>
+                        </select>
+
+
+                    </div>
+                    <div class="modal-footer">
+
+                        <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Annuler</button>
+                        <button type="submit" [disabled]="!AddDepenseFormGroup.valid" class="btn btn-primary">Envoyer</button>
+                    </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+<div class="modal fade" id="UpdateDepenseModal" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateModalLabel">Update Depense</h5>
+                <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+
+            </div>
+            <div class="modal-body">
+                <ng-container  *ngIf="depense$ | async as depenseup">
+
+                    <form novalidate [formGroup]="UpdateDepenseFormGroup" (ngSubmit)="handleUpdateDepense(depenseup.id)">
+
+                                <input  type="hidden" class="form-control"  formControlName="id"  [(ngModel)]="depenseup.id">
+                        <div class="mb-3">
+                            <label class="form-label">Montant :</label>
+                            <input type="number" class="form-control" formControlName="montant"  [(ngModel)]="depenseup.montant" name="montant">
+                            <p
+                                    *ngIf="
+                UpdateDepenseFormGroup.controls['montant'].touched &&
+                UpdateDepenseFormGroup.controls['montant'].errors &&
+                UpdateDepenseFormGroup.controls['montant'].errors!['required']
+              "
+                                    class="text-danger"
+                            >
+                                Montant is required
+                            </p>
+                        </div>
+
+
+                        <div class="mb-3">
+                            <label class="form-label">Titre :</label>
+                            <input type="text" class="form-control" formControlName="titre"  [(ngModel)]="depenseup.titre" name="titre">
+                            <p
+                                    *ngIf="
+                UpdateDepenseFormGroup.controls['titre'].touched &&
+                UpdateDepenseFormGroup.controls['titre'].errors &&
+                UpdateDepenseFormGroup.controls['titre'].errors!['required']
+              "
+                                    class="text-danger"
+                            >
+                                Titre is required
+                            </p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Commentaire :</label>
+                            <input type="text" class="form-control" formControlName="commentaire"  [(ngModel)]="depenseup.commentaire" name="commentaire">
+
+                        </div>
+
+                        <ng-container *ngIf="deplacements$ | async as dep">
+                            <div class="row">
+                                <div class="container row">
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Deplacement :</label>
+                                        <select  [(ngModel)]="depenseup.deplacement" formControlName="idDeplacement">
+
+                                            <option *ngFor="let d of dep "
+                                                    [value]="d.id">
+                                                {{d.id}}
+                                            </option>
+                                        </select>
+
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </ng-container>
+
+
+
+
+                        <div class="row">
+                            <div class="container row">
+
+                                <label >Piece Justificative</label>
+                                <input formControlName="pieceJustificative" class="form-control" type="text"  [(ngModel)]="depenseup.pieceJustificative">
+
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Status :</label>
+                            <select  [(ngModel)]="depenseup.status" formControlName="status">
+
+                                <option *ngFor="let s of statusList"
+                                        [value]="s" >
+                                    {{s}}
+                                </option>
+                            </select>
+
+
+                        </div>
+
+
+                        <div class="mb-3">
+                            <label class="form-label">Mode de Reglement :</label>
+                            <select [(ngModel)]="depenseup.modeReglement" formControlName="modeReglement">
+
+                                <option *ngFor="let m of modeReglementlist"
+                                        [value]="m"  >
+                                    {{m}}
+                                </option>
+                            </select>
+
+
+                        </div>
+                        <div class="modal-footer">
+
+                            <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Annuler</button>
+                            <button type="submit" [disabled]="!UpdateDepenseFormGroup.valid" class="btn btn-primary">Update</button>
+                        </div>
+                    </form>
+                </ng-container>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="AddDeplacementToDepenseModal" tabindex="-1" role="dialog" aria-labelledby="AddDeplacementToDepenseModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="AddDeplacementToDepenseModalLabel">Add Deplacement to Depense</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <ng-container  *ngIf="depense$ | async as depenseADDd">
+
+                    <form [formGroup]="AddDeplacementDepenseFG"  (ngSubmit)="handleAddDeplacementDepense(depenseADDd.id)">
+
+
+                        <select formControlName="idDeplacement" >
+                            <option  *ngFor="let p of deplacements$| async" [value]="p.id">{{p.adresse}}</option>
+                        </select>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                            <button type="submit" [disabled]="!AddDeplacementDepenseFG.valid" class="btn btn-primary">Ajouter</button>
+                        </div>
+                    </form>
+
+                </ng-container>
+            </div>
+
+        </div>
+    </div>
+</div>
+

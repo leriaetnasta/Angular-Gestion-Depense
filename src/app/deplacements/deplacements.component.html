@@ -1,0 +1,400 @@
+<div class="container mt-2">
+    <div class="row">
+        <div class="col">
+
+        <div class="card">
+            <div class="card-header">
+                Deplacements
+            </div>
+            <div class=" gap-3">
+
+            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#SaveDeplacementModal">Nouveau Deplacement</button>
+
+            </div>
+            <div class="card-body">
+                <div *ngIf="searchFormGroup">
+                    <!--afficher le formulaire seulement si searchformgroup est creée et initialisé!-->
+                    <form [formGroup]="searchFormGroup" (ngSubmit)="handleSearch()" >
+                        <div class="input-group">
+                            <label class="input-group-text">Keyword : </label>
+                            <input type="text" formControlName="keyword" class="form-control">
+                            <button class="btn bg-info"> <i class="bi bi-search"></i> </button>
+                        </div>
+                    </form>
+                </div>
+
+                <ng-container *ngIf="deplacements$ | async; else loadingOrErrorAlert">
+
+
+                </ng-container>
+
+                <ng-template #loadingOrErrorAlert>
+                    <ng-container *ngIf="errorObj; else loading">
+
+                    </ng-container>
+
+                    <!-- loading-->
+                    <ng-template #loading>
+                    </ng-template>
+                </ng-template>
+
+                <table class="table align-middle mb-0 bg-white">
+
+
+                    <thead >
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Adresse</th>
+                        <th scope="col">Depart</th>
+                        <th scope="col">Retour</th>
+                        <th scope="col">Edit</th>
+                        <th scope="col">Supprimer</th>
+
+
+                    </tr>
+                    </thead>
+
+
+
+                    <tbody>
+                    <tr class="table-success">
+                        <ng-container *ngIf="deplacementR | async as dep">
+                            <th scope="row"  >{{dep.id}}</th>
+                            <td >{{dep.adresse}}</td>
+                            <td>{{dep.dateDepart | date : 'dd-MM-yyyy:HH:mm:ss'}}</td>
+                            <td>{{dep.dateRetour | date : 'dd-MM-yyyy:HH:mm:ss'}}</td>
+                        </ng-container>
+                    </tr>
+                    <tr *ngFor="let d of deplacements$ | async">
+                        <th scope="row"  >{{d.id}}</th>
+                        <td >{{d.adresse}}</td>
+                        <td>{{d.dateDepart | date : 'dd-MM-yyyy:HH:mm:ss'}}</td>
+                        <td>{{d.dateRetour | date : 'dd-MM-yyyy:HH:mm:ss'}}</td>
+
+                        <td>
+                            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#UpdateDeplacementModal" (click)="handleGetDeplacement(d.id)">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+                        </td>
+
+                        <td>
+                            <button  type="button" class="btn btn-outline-danger" (click)="handleDeleteDeplacement(d)" >
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+
+                        <td>
+                            <button  type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#GetDepensesModal" (click)="handleGetDeplacement(d.id)" >
+                                <i class="bi bi-play"></i>
+                            </button>
+                        </td>
+
+                    </tr>
+
+                    </tbody>
+
+
+
+
+
+                </table>
+
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+</div>
+<div class="modal fade" id="UpdateDeplacementModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Update deplacement</h5>
+                <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+
+            </div>
+            <div class="modal-body">
+                <ng-container  *ngIf="deplacement | async as deplacementup">
+
+                    <form [formGroup]="UpdateDeplacementFormGroup" (ngSubmit)="handleUpdateDeplacement(deplacementup.id)">
+                        <input type="hidden" class="form-control"  formControlName="id" [(ngModel)]="deplacementup.id">
+                        <label for="message-text" class="col-form-label">ADRESSE:</label>
+                        <div class="form-group">
+
+                            <input id="message-text"  [(ngModel)]="deplacementup.adresse" type="text" class="form-control" formControlName="adresse" placeholder="Entrer l'adresse" ><p
+                                *ngIf="
+                                UpdateDeplacementFormGroup.controls['adresse'].touched &&
+                                UpdateDeplacementFormGroup.controls['adresse'].errors &&
+                                UpdateDeplacementFormGroup.controls['adresse'].errors!['required'] "
+                                class="text-danger"
+                        >
+                        Adresse is required
+                        </p>
+                    </div>
+                    <label for="message-text" class="col-form-label">Date Debut:</label>
+                    <div class="form-group">
+
+                        <input id="message-text"  [(ngModel)]="deplacementup.dateDepart" type="date" class="form-control" formControlName="dateDepart" placeholder="Entrer la date de debut" ><p
+                            *ngIf="
+                            UpdateDeplacementFormGroup.controls['dateDepart'].touched &&
+                            UpdateDeplacementFormGroup.controls['dateDepart'].errors &&
+                            UpdateDeplacementFormGroup.controls['dateDepart'].errors!['required'] "
+                            class="text-danger"
+                    >
+                    Date Debut is required
+                    </p>
+                </div>
+                <label for="message-text" class="col-form-label">Date Retour:</label>
+                    <div class="form-group">
+
+                        <input id="message-text"  [(ngModel)]="deplacementup.dateRetour" type="date" class="form-control" formControlName="dateRetour" placeholder="Entrer la Date de retour" ><p
+                            *ngIf="
+                            UpdateDeplacementFormGroup.controls['dateRetour'].touched &&
+                            UpdateDeplacementFormGroup.controls['dateRetour'].errors &&
+                            UpdateDeplacementFormGroup.controls['dateRetour'].errors!['required'] "
+                            class="text-danger"
+                    >
+                    Date Retour is required
+                    </p>
+                </div>
+
+
+                        <ng-container *ngIf="projets$ | async as pr">
+                            <div class="row">
+                                <div class="container row">
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Projet :</label>
+                                        <select [(ngModel)]="deplacementup.projet" formControlName="idProjet">
+
+                                            <option *ngFor="let p of pr "
+                                                    [value]="p.id">
+                                                {{p.id}}
+                                            </option>
+                                        </select>
+
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </ng-container>
+                        <ng-container *ngIf="employes$ | async as emp">
+                            <div class="row">
+                                <div class="container row">
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Employe :</label>
+                                        <select [(ngModel)]="deplacementup.employe" formControlName="idEmploye">
+
+                                            <option *ngFor="let e of emp "
+                                                    [value]="e.id">
+                                                {{e.id}}
+                                            </option>
+                                        </select>
+
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </ng-container>
+                        <ng-container *ngIf="depenses$ | async as dep">
+                            <div class="row">
+                                <div class="container row">
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Depenses :</label>
+                                        <select [(ngModel)]="deplacementup.listdepense" formControlName="idDepense">
+
+                                            <option *ngFor="let d of dep "
+                                                    [value]="d.id">
+                                                {{d.id}}
+                                            </option>
+                                        </select>
+
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </ng-container>
+
+
+                        <div class="modal-footer">
+
+                <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Annuler</button>
+                <button type="submit" [disabled]="!UpdateDeplacementFormGroup.valid" class="btn btn-primary">Update</button>
+            </div>
+            </form>
+            </ng-container>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="SaveDeplacementModal" tabindex="-1" role="dialog" aria-labelledby="saveDeplacementLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="saveDeplacementLabel">Nouveau Deplacement</h5>
+                <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+
+            </div>
+            <div class="modal-body">
+            <form novalidate [formGroup]="AddDeplacementFormGroup" (ngSubmit)="handleSaveDeplacement()">
+                <fieldset disabled>
+                    <div class="mb-3">
+                        <label for="disabledTextInput" class="form-label">ID</label>
+                        <input type="text" id="disabledTextInput" class="form-control" placeholder="ID">
+                    </div>
+                </fieldset>
+
+
+                <div class="form-group">
+
+                    <input id="message-text" type="text" class="form-control" formControlName="adresse" placeholder="Entrer l'adresse" ><p
+                        *ngIf="
+                        UpdateDeplacementFormGroup.controls['adresse'].touched &&
+                        UpdateDeplacementFormGroup.controls['adresse'].errors &&
+                        UpdateDeplacementFormGroup.controls['adresse'].errors!['required'] "
+                        class="text-danger"
+                >
+                Adresse is required
+                </p>
+            </div>
+            <label for="message-text" class="col-form-label">Date Debut:</label>
+            <div class="form-group">
+
+                <input id="date"   type="date" class="form-control" formControlName="dateDepart" placeholder="Entrer la date de debut" ><p
+                    *ngIf="
+                    UpdateDeplacementFormGroup.controls['dateDepart'].touched &&
+                    UpdateDeplacementFormGroup.controls['dateDepart'].errors &&
+                    UpdateDeplacementFormGroup.controls['dateDepart'].errors!['required'] "
+                    class="text-danger"
+            >
+            Date Debut is required
+            </p>
+        </div>
+        <label for="message-text" class="col-form-label">Date Retour:</label>
+            <div class="form-group">
+
+                <input id="date"   type="date" class="form-control" formControlName="dateRetour" placeholder="Entrer la Date de retour" ><p
+                    *ngIf="
+                    UpdateDeplacementFormGroup.controls['dateRetour'].touched &&
+                    UpdateDeplacementFormGroup.controls['dateRetour'].errors &&
+                    UpdateDeplacementFormGroup.controls['dateRetour'].errors!['required'] "
+                    class="text-danger"
+            >
+            Date Retour is required
+            </p>
+        </div>
+
+
+                <ng-container *ngIf="projets$ | async as pr">
+                    <div class="row">
+                        <div class="container row">
+
+                            <div class="mb-3">
+                                <label class="form-label">Projet Titre:</label>
+                                <select formControlName="idProjet">
+
+                                    <option *ngFor="let p of pr "
+                                            [value]="p.id">
+                                        {{p.titre}}
+                                    </option>
+                                </select>
+
+
+                            </div>
+                        </div>
+                    </div>
+
+                </ng-container>
+                <ng-container *ngIf="employes$ | async as emp">
+                    <div class="row">
+                        <div class="container row">
+
+                            <div class="mb-3">
+                                <label class="form-label">Employe Matricule :</label>
+                                <select formControlName="idEmploye">
+
+                                    <option *ngFor="let e of emp "
+                                            [value]="e.id">
+                                        {{e.matricule}}
+                                    </option>
+                                </select>
+
+
+                            </div>
+                        </div>
+                    </div>
+
+                </ng-container>
+                <ng-container *ngIf="depenses$ | async as dep">
+                    <div class="row">
+                        <div class="container row">
+
+                            <div class="mb-3">
+                                <label class="form-label">Depenses Titre:</label>
+                                <select formControlName="idDepense">
+
+                                    <option *ngFor="let d of dep "
+                                            [value]="d.id">
+                                        {{d.titre}}
+                                    </option>
+                                </select>
+
+
+                            </div>
+                        </div>
+                    </div>
+
+                </ng-container>
+
+                <div class="modal-footer">
+
+                    <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Annuler</button>
+                    <button type="submit" [disabled]="!AddDeplacementFormGroup.valid" class="btn btn-primary">Envoyer</button>
+                </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="GetDepensesModal" tabindex="-1" role="dialog" aria-labelledby="GetDepensesModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="GetDepensesModalLabel">Plus de details</h5>
+                <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+
+            </div>
+            <div class="modal-body">
+                <ng-container *ngIf="deplacement | async as deplacementDetails">
+
+                    <table class="table">
+                        <thead>
+                        <th>ID</th><th>Motif</th><th>Status</th><th>Montant</th><th>Mode Reglement</th>
+                        </thead>
+                        <tbody>
+                        <tr *ngFor="let d of deplacementDetails.listdepense">
+                            <th scope="row"  >{{d.id}}</th>
+                            <td >{{d.titre}}</td>
+                            <td  >{{d.status}}</td>
+                            <td >{{d.montant}}</td>
+                            <td >{{d.modeReglement}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </ng-container>
+            </div>
+
+        </div>
+    </div>
+</div>

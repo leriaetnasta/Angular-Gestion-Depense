@@ -1,0 +1,289 @@
+<div class="container mt-2">
+    <div >
+        <div class="col ">
+            <div class="card">
+                <div class="card-header">
+                    Clients
+                </div>
+                <div class="card-body">
+                    <div class=" gap-5">
+
+                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#SaveClientModal">Nouveau Client</button>
+            
+                    </div>
+                          <div *ngIf="searchFormGroup">
+
+
+              <!--afficher le formulaire seulement si searchformgroup est creée et initialisé!-->
+           <form [formGroup]="searchFormGroup" (ngSubmit)="handleSearch()" >
+                  <div class="input-group">
+                       <label class="input-group-text">Keyword : </label>
+                       <input type="text" formControlName="keyword" class="form-control">
+                       <button class="btn bg-info"> <i class="bi bi-search"></i> </button>
+                  </div>
+             </form>
+        </div>
+
+        <ng-container *ngIf="clients$ | async; else loadingOrErrorAlert">
+
+
+        </ng-container>
+
+        <ng-template #loadingOrErrorAlert>
+            <ng-container *ngIf="errorObj; else loading">
+
+            </ng-container>
+
+            <!-- loading-->
+            <ng-template #loading>
+            </ng-template>
+        </ng-template>
+
+
+        <table class="table">
+
+
+        <thead >
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">Nom</th>
+        <th scope="col">Projets</th>
+        <th scope="col">Editer</th>
+        <th scope="col">Supprimer</th>
+        <th scope="col">Lier Projet</th>
+
+
+    </tr>
+    </thead>
+
+
+
+    <tbody>
+
+    <tr *ngFor="let c of clients$ | async">
+        <th scope="row"  >{{c.id}}</th>
+        <td >{{c.nom}}</td>
+        <td>
+            <button  type="button"  data-bs-toggle="modal" data-bs-target="#GetProjetClientModal" (click)="handleGetClient(c.id)" class="btn btn-outline-dark">
+                <i class="bi bi-arrow-right-square"></i>
+
+            </button>
+        </td>
+        <td>
+          <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#UpdateClientModal" (click)="handleGetClient(c.id)">
+              <i class="bi bi-pencil-square"></i>
+          </button>
+        </td>
+        <td>
+            <button  type="button" class="btn btn-outline-danger" (click)="handleDeleteClient(c)" >
+                <i class="bi bi-trash"></i>
+            </button>
+        </td>
+        <td>
+            <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#AddProjetToClientModal" (click)="handleGetClient(c.id)" >
+                <i class="bi bi-plus-square"></i>
+            </button>
+        </td>
+
+
+
+    </tr>
+
+    </tbody>
+
+
+
+
+
+</table>
+                </div>
+</div>
+        </div></div></div>
+<div class="modal fade" id="GetProjetClientModal" tabindex="-1" role="dialog" aria-labelledby="GetProjetClientModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="GetProjetClientModalLabel">Plus de details</h5>
+                    <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+    
+                </div>
+                <div class="modal-body">
+                    <ng-container *ngIf="client | async as clientDetails">
+
+                        <table class="table">
+                            <thead>
+                            <th>ID</th><th>Nom du projet</th><th>Date Debut</th><th>Date Fin</th><th>Montant total</th>
+                            </thead>
+                            <tbody>
+                            <tr *ngFor="let p of clientDetails.listProjet">
+                                <td><strong>{{p.id}}</strong></td>
+                                <td>{{p.titre}}</td>
+                                <td>{{p.dateDebut | date : 'dd-MM-yyyy:HH-mm-ss'}}</td>
+                                <td>{{p.dateFin | date : 'dd-MM-yyyy:HH-mm-ss'}}</td>
+                                <td class="text-end">{{p.montantTotal  | currency}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </ng-container>
+                </div>
+    
+            </div>
+        </div>
+    </div>
+<div class="modal fade" id="UpdateClientModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Update Client</h5>
+                <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+
+            </div>
+            <div class="modal-body">
+                <ng-container  *ngIf="client | async as clientup">
+
+                    <form [formGroup]="UpdateClientFormGroup" (ngSubmit)="handleUpdateClient(clientup.id)">
+                        <input type="hidden" class="form-control"  formControlName="id" [(ngModel)]="clientup.id">
+                        <label for="message-text" class="col-form-label">Nom:</label>
+                        <div class="form-group">
+
+                            <input id="message-text"  [(ngModel)]="clientup.nom" type="text" class="form-control" formControlName="nom" placeholder="Entrer le nom" ><p
+                                *ngIf="
+                UpdateClientFormGroup.controls['nom'].touched &&
+                UpdateClientFormGroup.controls['nom'].errors &&
+                UpdateClientFormGroup.controls['nom'].errors!['required']
+              "
+                                class="text-danger"
+                        >
+                            Name is required
+                        </p>
+                    </div>
+                        <ng-container *ngIf="projet$ | async as pr">
+                            <div class="row">
+                                <div class="container row">
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Projet :</label>
+                                        <select [(ngModel)]="clientup.listProjet"  formControlName="idP">
+
+                                            <option *ngFor="let p of pr "
+                                                    [value]="p.id">
+                                                {{p.id}}
+                                            </option>
+                                        </select>
+
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </ng-container>
+            <div class="modal-footer">
+
+                <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Annuler</button>
+                <button type="submit" [disabled]="!UpdateClientFormGroup.valid" class="btn btn-primary">Update</button>
+            </div>
+            </form>
+            </ng-container>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="AddProjetToClientModal" tabindex="-1" role="dialog" aria-labelledby="AddProjetModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="AddProjetModalLabel">Add Project to Client</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <ng-container  *ngIf="client | async as clientADDP">
+
+                    <form [formGroup]="AddProjetToClientFG"  (ngSubmit)="handleAddProjetClient(clientADDP.id)">
+
+
+                        <select formControlName="idProjet" >
+                            <option  *ngFor="let p of projet$| async" [value]="p.id">{{p.titre}}</option>
+                        </select>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                            <button type="submit" [disabled]="!AddProjetToClientFG.valid" class="btn btn-primary">Ajouter</button>
+                        </div>
+
+
+
+
+                    </form>
+
+                </ng-container>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="SaveClientModal" tabindex="-1" role="dialog" aria-labelledby="saveClientLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="saveClientLabel">Nouveau Client</h5>
+                <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+
+            </div>
+            <div class="modal-body">
+            <form novalidate [formGroup]="AddClientFormGroup" (ngSubmit)="handleSaveClient()">
+                <fieldset disabled>
+                    <div class="mb-3">
+                        <label for="disabledTextInput" class="form-label">ID</label>
+                        <input type="text" id="disabledTextInput" class="form-control" placeholder="ID">
+                    </div>
+                </fieldset>
+
+
+                <div class="mb-3">
+                    <label class="form-label">Nom :</label>
+                    <input type="text" class="form-control" formControlName="nom" placeholder="Entrer le nom" name="nom">
+                    <p
+                            *ngIf="
+                AddClientFormGroup.controls['nom'].touched &&
+                AddClientFormGroup.controls['nom'].errors &&
+                AddClientFormGroup.controls['nom'].errors!['required']
+              "
+                            class="text-danger"
+                    >
+                        Name is required
+                    </p>
+                </div>
+                <ng-container *ngIf="projet$ | async as pr">
+                    <div class="row">
+                        <div class="container row">
+
+                            <div class="mb-3">
+                                <label class="form-label">Projet :</label>
+                                <select formControlName="idP">
+
+                                    <option *ngFor="let p of pr "
+                                            [value]="p.id">
+                                        {{p.id}}
+                                    </option>
+                                </select>
+
+
+                            </div>
+                        </div>
+                    </div>
+
+                </ng-container>
+                <div class="modal-footer">
+
+                    <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Annuler</button>
+                    <button type="submit" [disabled]="!AddClientFormGroup.valid" class="btn btn-primary">Envoyer</button>
+                </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>

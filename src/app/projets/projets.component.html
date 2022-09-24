@@ -1,0 +1,400 @@
+<div class="container mt-2">
+        <div class="col ">
+            <div class="card">
+                <div class="card-header">
+                    Projets
+                </div>
+                <div class="card-body">
+                    <div class=" gap-5">
+
+                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#SaveProjetModal">Nouveau Projet</button>
+
+                    </div>
+                    <div *ngIf="searchFormGroup">
+                        <!--afficher le formulaire seulement si searchformgroup est creée et initialisé!-->
+                        <form [formGroup]="searchFormGroup" (ngSubmit)="handleSearch()" >
+                            <div class="input-group">
+                                <label class="input-group-text">Keyword : </label>
+                                <input type="text" formControlName="keyword" class="form-control">
+                                <button class="btn bg-info"> <i class="bi bi-search"></i> </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <ng-container *ngIf="projets$ | async; else loadingOrErrorAlert">
+
+
+                    </ng-container>
+
+                    <ng-template #loadingOrErrorAlert>
+                        <ng-container *ngIf="errorObj; else loading">
+
+                        </ng-container>
+
+                        <!-- loading-->
+                        <ng-template #loading>
+                        </ng-template>
+                    </ng-template>
+                    <table class="table">
+
+
+                        <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Nom du projet</th>
+                            <th scope="col">Date Debut</th>
+                            <th scope="col">Date Fin</th>
+                            <th scope="col">Montant total</th>
+                            <th scope="col">Edit</th>
+                            <th scope="col">Supprimer</th>
+                            <th scope="col">Plus de details</th>
+                            <th scope="col">Lier Client</th>
+
+                        </tr>
+
+                        </thead>
+
+
+                            <tbody>
+                            <tr *ngFor="let p of projets$ | async">
+                                <td><strong>{{p.id}}</strong></td>
+                                <td>{{p.titre}}</td>
+                                <td>{{p.dateDebut | date : 'dd-MM-yyyy'}}</td>
+                                <td>{{p.dateFin | date : 'dd-MM-yyyy'}}</td>
+                                <td class="text-end">{{p.montantTotal  | currency}}</td>
+
+                                <td>
+                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#UpdateProjetModal" (click)="handleGetProjet(p.id)">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+                                </td>
+
+
+                                <td>
+                                    <button  type="button" class="btn btn-outline-danger" (click)="handleDeleteProjet(p)" >
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#GetProjetModal" (click)="handleGetProjet(p.id)">
+                                        <i class="bi bi-arrow-left-circle-fill"></i>
+
+                                    </button>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#AddProjetToClientModal" (click)="handleGetProjet(p.id)" >
+                                        <i class="bi bi-plus-square"></i>
+                                    </button>
+                                </td>
+
+                            </tr>
+                            </tbody>
+
+
+
+
+
+
+
+
+
+
+
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+
+
+
+</div>
+<div class="modal fade" id="UpdateProjetModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Update Projet</h5>
+                <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+
+            </div>
+            <div class="modal-body">
+                <ng-container  *ngIf="projet | async as projetup">
+
+                    <form [formGroup]="UpdateProjetFormGroup" (ngSubmit)="handleUpdateProjet(projetup.id)">
+                        <input type="hidden" class="form-control"  formControlName="id" [(ngModel)]="projetup.id">
+                        <label for="message-text" class="col-form-label">Titre:</label>
+                        <div class="form-group">
+
+                            <input id="message-text"  [(ngModel)]="projetup.titre" type="text" class="form-control" formControlName="titre" placeholder="Entrer le titre" ><p
+                                *ngIf="
+                UpdateProjetFormGroup.controls['titre'].touched &&
+                UpdateProjetFormGroup.controls['titre'].errors &&
+                UpdateProjetFormGroup.controls['titre'].errors!['required']
+              "
+                                class="text-danger"
+                        >
+                            Titre is required
+                        </p>
+                        </div>
+                        <div class="form-group">
+
+                            <input id="message-text"  [(ngModel)]="projetup.dateDebut" type="date" class="form-control" formControlName="dateDebut" placeholder="Entrer la date debut" ><p
+                                *ngIf="
+                UpdateProjetFormGroup.controls['dateDebut'].touched &&
+                UpdateProjetFormGroup.controls['dateDebut'].errors &&
+                UpdateProjetFormGroup.controls['dateDebut'].errors!['required']
+              "
+                                class="text-danger"
+                        >
+                            Date Debut is required
+                        </p>
+                        </div>
+                        <div class="form-group">
+
+                            <input id="message-text"  [(ngModel)]="projetup.dateFin" type="date" class="form-control" formControlName="dateFin" placeholder="Entrer la Date Fin" ><p
+                                *ngIf="
+                UpdateProjetFormGroup.controls['dateFin'].touched &&
+                UpdateProjetFormGroup.controls['dateFin'].errors &&
+                UpdateProjetFormGroup.controls['dateFin'].errors!['required']
+              "
+                                class="text-danger"
+                        >
+                            Date Fin is required
+                        </p>
+                        </div>
+                        <div class="form-group">
+
+                            <input id="message-text"  [(ngModel)]="projetup.montantTotal" type="number" class="form-control" formControlName="montantTotal" placeholder="Entrer le montant total" ><p
+                                *ngIf="
+                UpdateProjetFormGroup.controls['montantTotal'].touched &&
+                UpdateProjetFormGroup.controls['montantTotal'].errors &&
+                UpdateProjetFormGroup.controls['montantTotal'].errors!['required']
+              "
+                                class="text-danger"
+                        >
+                            Montant Total is required
+                        </p>
+                        </div>
+
+                        <ng-container *ngIf="employes$ | async as emp">
+                                    <div class="form-group">
+                                        <label class="form-label">Employe :</label>
+                                        <select [(ngModel)]="projetup.listEmploye" formControlName="idEmploye">
+
+                                            <option *ngFor="let e of emp "
+                                                    [value]="e.id">
+                                                {{e.id}}
+                                            </option>
+                                        </select>
+
+
+                            </div>
+
+                        </ng-container>
+
+
+
+
+
+                        <ng-container *ngIf="deplacements$ | async as dep">
+                                    <div class="form-group">
+                                        <label class="form-label">Deplacements :</label>
+                                        <select [(ngModel)]="projetup.listDeplacement" formControlName="idDeplacement">
+
+                                            <option *ngFor="let de of dep "
+                                                    [value]="de.id">
+                                                {{de.id}}
+                                            </option>
+                                        </select>
+
+
+                            </div>
+
+                        </ng-container>
+
+
+                        <ng-container *ngIf="clients$ | async as cl">
+                            <div class="form-group">
+                                        <label class="form-label">Clients :</label>
+                                        <select [(ngModel)]="projetup.client" formControlName="idClient">
+
+                                            <option *ngFor="let c of cl "
+                                                    [value]="c.id">
+                                                {{c.id}}
+                                            </option>
+                                        </select>
+
+
+                            </div>
+
+                        </ng-container>
+
+
+
+
+
+
+
+
+                        <div class="modal-footer">
+
+                            <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Annuler</button>
+                            <button type="submit" [disabled]="!UpdateProjetFormGroup.valid" class="btn btn-primary">Update</button>
+                        </div>
+                    </form>
+                </ng-container>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="SaveProjetModal" tabindex="-1" role="dialog" aria-labelledby="SaveModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="SaveModalLabel">Save Projet</h5>
+                <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+
+            </div>
+            <div class="modal-body">
+
+                    <form [formGroup]="AddProjetFormGroup" (ngSubmit)="handleSaveProjet()">
+                        <fieldset disabled>
+                            <div class="mb-3">
+                                <label for="disabledTextInput" class="form-label">ID</label>
+                                <input type="text" id="disabledTextInput" class="form-control" placeholder="ID">
+                            </div>
+                        </fieldset>
+                        <label for="message-text" class="col-form-label">Titre:</label>
+                        <div class="form-group">
+
+                            <input id="message-text" type="text" class="form-control" formControlName="titre" placeholder="Entrer le titre" ><p
+                                *ngIf="
+                AddProjetFormGroup.controls['titre'].touched &&
+                AddProjetFormGroup.controls['titre'].errors &&
+                AddProjetFormGroup.controls['titre'].errors!['required']
+              "
+                                class="text-danger"
+                        >
+                            Titre is required
+                        </p>
+                        </div>
+                        <div class="form-group">
+
+                            <input id="message-text"   type="date" class="form-control" formControlName="dateDebut" placeholder="Entrer la date debut" ><p
+                                *ngIf="
+                AddProjetFormGroup.controls['dateDebut'].touched &&
+                AddProjetFormGroup.controls['dateDebut'].errors &&
+                AddProjetFormGroup.controls['dateDebut'].errors!['required']
+              "
+                                class="text-danger"
+                        >
+                            Date Debut is required
+                        </p>
+                        </div>
+                        <div class="form-group">
+
+                            <input id="message-text"  type="date" class="form-control" formControlName="dateFin" placeholder="Entrer la Date Fin" ><p
+                                *ngIf="
+                AddProjetFormGroup.controls['dateFin'].touched &&
+                AddProjetFormGroup.controls['dateFin'].errors &&
+                AddProjetFormGroup.controls['dateFin'].errors!['required']
+              "
+                                class="text-danger"
+                        >
+                            Date Fin is required
+                        </p>
+                        </div>
+                        <div class="form-group">
+
+                            <input id="message-text"  type="number" class="form-control" formControlName="montantTotal" placeholder="Entrer le montant total" ><p
+                                *ngIf="
+                AddProjetFormGroup.controls['montantTotal'].touched &&
+                AddProjetFormGroup.controls['montantTotal'].errors &&
+                AddProjetFormGroup.controls['montantTotal'].errors!['required']
+              "
+                                class="text-danger"
+                        >
+                            Montant Total is required
+                        </p>
+                        </div>
+                        <ng-container *ngIf="employes$ | async as emp">
+                            <div class="row">
+                                <div class="container row">
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Employe Matricule :</label>
+                                        <select formControlName="idEmploye">
+
+                                            <option *ngFor="let e of emp "
+                                                    [value]="e.id">
+                                                {{e.matricule}}
+                                            </option>
+                                        </select>
+
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </ng-container>
+
+                        <ng-container *ngIf="deplacements$ | async as dep">
+                            <div class="row">
+                                <div class="container row">
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Deplacement :</label>
+                                        <select formControlName="idDeplacement">
+
+                                            <option *ngFor="let d of dep "
+                                                    [value]="d.id">
+                                                {{d.id}}
+                                            </option>
+                                        </select>
+
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </ng-container>
+
+
+
+
+                        <ng-container *ngIf="clients$ | async as cl">
+                            <div class="row">
+                                <div class="container row">
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Clients :</label>
+                                        <select formControlName="idClient">
+
+                                            <option *ngFor="let c of cl "
+                                                    [value]="c.id">
+                                                {{c.id}}
+                                            </option>
+                                        </select>
+
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </ng-container>
+
+
+                        <div class="modal-footer">
+
+                            <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Annuler</button>
+                            <button type="submit" [disabled]="!AddProjetFormGroup.valid" class="btn btn-primary">Update</button>
+                        </div>
+                    </form>
+            </div>
+
+        </div>
+    </div>
+</div>

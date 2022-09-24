@@ -1,0 +1,164 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">GestionDepense</a>
+        <button
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">Home</a>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a
+                            class="nav-link dropdown-toggle"
+                            id="navbarDropdown"
+                            role="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                    >
+                        Depense
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li>
+                            <a class="dropdown-item" routerLink="/depenses"
+                            >Historique</a
+                            >
+                        </li>
+                        <li>
+                            <a class="dropdown-item" routerLink="/add-client"
+                            >Ajouter Depense</a
+                            >
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a
+                            class="nav-link dropdown-toggle"
+                            id="navbarDropdown"
+                            role="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                    >
+                        Projet
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li>
+                            <a class="dropdown-item" routerLink="/projets">List Projets</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" routerLink="/new-account"
+                            >Ajouter Projet</a
+                            >
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a
+                            class="nav-link dropdown-toggle"
+                            id="navbarDropdown"
+                            role="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                    >
+                        Deplacement
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li>
+                            <a class="dropdown-item" routerLink="/deplacements">List Deplacement</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" routerLink="/adddeplacement"
+                            >Ajouter Deplacement</a
+                            >
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a
+                            class="nav-link dropdown-toggle"
+                            id="navbarDropdown"
+                            role="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                    >
+                        Clients
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li>
+                            <a class="dropdown-item" routerLink="/clients">List Clients</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" routerLink="/addclient"
+                            >Ajouter Client</a
+                            >
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a
+                            class="nav-link dropdown-toggle"
+                            id="navbarDropdown"
+                            role="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                    >
+                        Employes
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li>
+                            <a class="dropdown-item" routerLink="/employes">List Employes</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" routerLink="/addemploye"
+                            >Ajouter Employe</a
+                            >
+                        </li>
+                    </ul>
+                </li>
+
+
+            </ul>
+            <form class="d-flex">
+                <input
+                        class="form-control me-2"
+                        type="search"
+                        placeholder="Search"
+                        aria-label="Search"
+                />
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+<ul>
+
+    <li  *ngIf="!isLoggedIn" class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" routerLink="/sign-up" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Login
+        </a>
+        <a routerLink="/sign-up" class="float-right sign-up mr-2">Sign up</a>
+
+    </li>
+
+            <li  *ngIf="isLoggedIn" class="nav-item dropdown">
+                        <button (click)="goToUserProfile()" >Profile</button>
+                        <button (click)="logout()" >Logout</button>
+
+                    <button class="userdetails" id="dropdownBasic1" >
+                        {{username}}
+                    </button>
+
+
+</ul>
+                </div>
+    </div>
+</nav>
