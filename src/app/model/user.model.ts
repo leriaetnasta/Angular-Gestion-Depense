@@ -1,12 +1,16 @@
 export interface User{
-    userId:string;
-    username:string,
-    password:string;
-    active:boolean;
-    appRoles :Role[]
+     userId: string;
+     firstName: string;
+     lastName: string;
+     username: string;
+     email: string;
+     lastLoginDate: Date;
+     lastLoginDateDisplay: Date;
+     joinDate: Date;
+     profileImageUrl: string;
+     active: boolean;
+     notLocked: boolean;
+     role: string;
+     authorities: [];
 }
-export interface Role{
-    roleId:number;
-    roleName:string;
-    description:string;
-}
+

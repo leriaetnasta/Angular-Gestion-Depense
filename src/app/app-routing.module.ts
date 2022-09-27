@@ -7,16 +7,15 @@ import {ProjetsComponent} from "./projets/projets.component";
 import {ClientsComponent} from "./clients/clients.component";
 import {LoginComponent} from "./login/login.component";
 import {SignupComponent} from "./signup/signup.component";
-import {AuthGuard} from "./guards/auth.guard";
-import {RoleGuardGuard} from "./guards/role-guard.guard";
+import {AuthenticationGuard} from "./guard/authentication.guard";
 
 const routes: Routes = [
     {path : '', redirectTo : "login",pathMatch:"full"},
-  {path : 'depenses', component : DepensesComponent,  canActivate: [AuthGuard]},
-  {path : 'employes', component : EmployesComponent, canActivate: [AuthGuard]},
-  {path : 'deplacements', component : DeplacementsComponent, canActivate: [AuthGuard]},
-  {path : 'projets', component : ProjetsComponent, canActivate: [AuthGuard]},
-  {path : 'clients', component : ClientsComponent, canActivate: [AuthGuard]},
+  {path : 'depenses', component : DepensesComponent,  canActivate: [AuthenticationGuard]},
+  {path : 'employes', component : EmployesComponent, canActivate: [AuthenticationGuard]},
+  {path : 'deplacements', component : DeplacementsComponent, canActivate: [AuthenticationGuard]},
+  {path : 'projets', component : ProjetsComponent, canActivate: [AuthenticationGuard]},
+  {path : 'clients', component : ClientsComponent, canActivate: [AuthenticationGuard]},
   {path : 'login', component : LoginComponent},
   {path : 'sign-up', component : SignupComponent}
 

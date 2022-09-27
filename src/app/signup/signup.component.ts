@@ -14,36 +14,23 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class SignupComponent implements OnInit {
   ADDsignupRequestPayload!: FormGroup;
-  signUpRequestPlayload$ !:Observable<SignupRequestPayload>;
+  signUpRequestPlayload$ !: Observable<SignupRequestPayload>;
 
   signupForm!: FormGroup;
-  constructor(private authService: AuthenticationService,private fb:FormBuilder, private router: Router,private toastr: ToastrService) { }
+
+  constructor(private authService: AuthenticationService, private fb: FormBuilder, private router: Router, private toastr: ToastrService) {
+  }
 
   ngOnInit(): void {
 
-    this.signupForm= this.fb.group({
-      username:  this.fb.control('', Validators.required),
-      email:  this.fb.control('', [Validators.required, Validators.email]),
-      password:  this.fb.control('', Validators.required)
+    this.signupForm = this.fb.group({
+      username: this.fb.control('', Validators.required),
+      email: this.fb.control('', [Validators.required, Validators.email]),
+      password: this.fb.control('', Validators.required)
     });
 
   }
 
 
-
-
-  signup() {
-    let signUpRequestPlayload$=this.signupForm?.value;
-
-    this.authService.signup(signUpRequestPlayload$)
-        .subscribe(data => {
-          this.router.navigate(['/login'],
-              { queryParams: { registered: 'true' } });
-        }, error => {
-          console.log(error);
-          this.toastr.error('Registration Failed! Please try again');
-
-        });
-  }
-
 }
+

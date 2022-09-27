@@ -12,10 +12,16 @@ import { EmployesComponent } from './employes/employes.component';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {LoginComponent} from "./login/login.component";
 import { SignupComponent } from './signup/signup.component';
-import {HttpClientModule} from "@angular/common/http";
+import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {NgxWebstorageModule} from "ngx-webstorage";
 import {ToastrModule} from "ngx-toastr";
+import {AuthenticationService} from "./services/authentication.service";
+import {UserService} from "./services/user.service";
+import {AuthInterceptor} from "./interceptors/auth.interceptor";
+import {AuthenticationGuard} from "./guard/authentication.guard";
+import {NotificationModule} from "./notification.module";
+import {NotificationService} from "./services/notification.service";
 
 @NgModule({
   declarations: [
@@ -38,9 +44,11 @@ import {ToastrModule} from "ngx-toastr";
     BrowserAnimationsModule,
     NgxWebstorageModule.forRoot(),
     ToastrModule.forRoot(),
+    NotificationModule,
 
   ],
-  providers: [],
+  providers: [NotificationService,AuthenticationGuard, AuthenticationService, UserService,
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true } ],
   bootstrap: [AppComponent]
 
 })

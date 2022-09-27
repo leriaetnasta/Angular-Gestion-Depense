@@ -1,87 +1,65 @@
 import {EventEmitter, Injectable, Output} from '@angular/core';
 import {User} from "../model/user.model";
-import {HttpClient, HttpHeaders} from "@angular/common/http";
-import {SignupRequestPayload} from "../model/singup-request.payload";
+import {HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse} from "@angular/common/http";
 import {map, Observable, tap, throwError} from "rxjs";
-import {LoginRequestPayload} from "../model/login-request.payload";
-import {LoginResponse} from "../model/login-response.payload";
 import {environment} from "../../environments/environment";
-import {LocalStorageService} from "ngx-webstorage";
+import {JwtHelperService} from "@auth0/angular-jwt";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthenticationService {
+  private token:any;
+  private loggedInUsername:any ;
+  private jwtHelper=new JwtHelperService();
+  constructor(private http: HttpClient) {}
 
-  @Output() loggedIn: EventEmitter<boolean> = new EventEmitter();
-  @Output() username: EventEmitter<string> = new EventEmitter();
-  refreshTokenPayload = {
-    refreshToken: this.getRefreshToken(),
-    username: this.getUserName()
+  public login(user: User): Observable<HttpResponse<User>> {
+    return this.http.post<User>(environment.backendHost+"/user/login", user, { observe: 'response' });
+  }
+  public register(user: User):  Observable<User|HttpErrorResponse>{
+    return this.http.post<User|HttpErrorResponse>(environment.backendHost+"/user/register", user);
+  }
+  public logOut():  void{
+    this.token=null;
+    this.loggedInUsername=null;
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    localStorage.removeItem('users');
+
+  }
+  public saveToken(token:string):  void{
+    this.token=token;
+    localStorage.setItem('token',token); // token:'fsggerger'
+  }
+  public addUserToLocalCache(user:User):void{ // add the user to localstorage
+    localStorage.setItem('user',JSON.stringify(user));
+  }
+  public getUserFromLocalCache():User{
+    return JSON.parse(localStorage.getItem("user")||'{}');
+  }
+  public loadTokenFromLocalCache():void{
+    this.token=localStorage.getItem('token');
+  }
+  public getToken():string{
+    return this.token;
   }
 
-
-
-  constructor(private httpClient: HttpClient,
-              private localStorage: LocalStorageService) {
-  }
-
-  signup(signupRequestPayload: SignupRequestPayload): Observable<any> {
-    return this.httpClient.post(environment.backendHost +'/api/auth/signup', signupRequestPayload, { responseType: 'text' });
-  }
-  login(loginRequestPayload: LoginRequestPayload): Observable<boolean> {
-    return this.httpClient.post<LoginResponse>(environment.backendHost +'/api/auth/login',
-        loginRequestPayload).pipe(map(data => {
-      this.localStorage.store('authenticationToken', data.authenticationToken);
-      this.localStorage.store('username', data.username);
-      this.localStorage.store('refreshToken', data.refreshToken);
-      this.localStorage.store('expiresAt', data.expiresAt);
-
-      this.loggedIn.emit(true);
-      this.username.emit(data.username);
-      return true;
-    }));
-  }
-  getJwtToken() {
-    return this.localStorage.retrieve('authenticationToken');
-  }
-
-  refreshToken() {
-    return this.httpClient.post<LoginResponse>(environment.backendHost +'/api/auth/refresh/token',
-        this.refreshTokenPayload)
-        .pipe(tap(response => {
-          this.localStorage.clear('authenticationToken');
-          this.localStorage.clear('expiresAt');
-
-          this.localStorage.store('authenticationToken',
-              response.authenticationToken);
-          this.localStorage.store('expiresAt', response.expiresAt);
-        }));
-  }
-
-  logout() {
-    this.httpClient.post(environment.backendHost +'/api/auth/logout', this.refreshTokenPayload,
-        { responseType: 'text' })
-        .subscribe(data => {
-          console.log(data);
-        }, error => {
-          throwError(error);
-        })
-    this.localStorage.clear('authenticationToken');
-    this.localStorage.clear('username');
-    this.localStorage.clear('refreshToken');
-    this.localStorage.clear('expiresAt');
-  }
-
-  getUserName() {
-    return this.localStorage.retrieve('username');
-  }
-  getRefreshToken() {
-    return this.localStorage.retrieve('refreshToken');
-  }
-
-  isLoggedIn(): boolean {
-    return this.getJwtToken() != null;
+  //function to check if user is logged in or not
+  public isLoggedIn():boolean{
+    this.loadTokenFromLocalCache();
+    if(this.token!=null && this.token!==''){
+      if(this.jwtHelper.decodeToken(this.token).sub!=null||''){
+        if(this.jwtHelper.isTokenExpired(this.token)){
+          this.loggedInUsername=this.jwtHelper.decodeToken(this.token).sub;
+          return true;
+        }
+      }
+    }else{
+      this.logOut();
+      return false;
+    }
+    return false;
   }
 }
 
