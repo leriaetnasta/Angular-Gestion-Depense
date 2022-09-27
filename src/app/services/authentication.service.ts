@@ -14,7 +14,7 @@ export class AuthenticationService {
   private jwtHelper=new JwtHelperService();
   constructor(private http: HttpClient) {}
 
-  public login(user: User): Observable<HttpResponse<User>> {
+  public login(user: User): Observable<HttpResponse<User>|HttpErrorResponse> {
     return this.http.post<User>(environment.backendHost+"/user/login", user, { observe: 'response' });
   }
   public register(user: User):  Observable<User|HttpErrorResponse>{

@@ -1,66 +1,41 @@
 
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+<div class="container bootstrap snippets bootdey">
+    <div class="lc-block col-md-4 col-md-offset-4 toggled" id="l-login">
+        <div class="lcb-float"><i class="fa fa-users"></i></div>
+        <h3>Connectez vous a <strong> GeFinance </strong></h3>
 
-
-<div class="content">
-    <div class="container mt-lg-5">
-        <div class="row">
-
-            <div class="col-md-6 contents">
-                <div class="row justify-content-center">
-                    <div class="col col-md-6">
-                        <div class="mb-4">
-                            <h3>Connectez vous a <strong> GeFinance </strong></h3>
-                        </div>
-
-                        <form novalidate [formGroup]="LoginFormGroup" (ngSubmit)="handleLogin()" >
-                            <div class="form-group first">
-                                <label for="username">Username</label>
-                                <input  type="text"  class="form-control" formControlName="username"  id="username">
-                                <p
-                                        *ngIf="
+        <div class="form-group">
+            <input  type="text"  class="form-control" formControlName="username" placeholder="username" >
+            <p
+                    *ngIf="
                 LoginFormGroup.controls['username'].touched &&
                 LoginFormGroup.controls['username'].errors &&
                 LoginFormGroup.controls['username'].errors!['required']
               "
-                                        class="text-danger"
-                                >
-                                    Username is required
-                                </p>
-                            </div>
-                            <div class="form-group last mb-4">
-                                <label for="password">Password</label>
-                                <input type="password" class="form-control" formControlName="password"  id="password">
-                                <p
-                                        *ngIf="
+                    class="text-danger"
+            >
+                Username is required
+            </p>
+        </div>
+        <div class="form-group">
+            <input type="password" class="form-control" formControlName="password"  placeholder="password">
+            <p
+                    *ngIf="
                 LoginFormGroup.controls['password'].touched &&
                 LoginFormGroup.controls['password'].errors &&
                 LoginFormGroup.controls['password'].errors!['required']
               "
-                                        class="text-danger"
-                                >
-                                    Password is required
-                                </p>
-                            </div>
+                    class="text-danger"
+            >
+                Password is required
+            </p>        </div>
+        <div class="clearfix"></div>
+        <button type="submit"  [disabled]="!LoginFormGroup.valid" class="btn btn-block btn-primary btn-float m-t-25">Sign In</button>
 
-
-
-                            <div class="login-failed" *ngIf='this.isError'>
-                                <p class="login-failed-text">Login Failed. Please check your credentials and try again.</p>
-                            </div>
-                            <div class="login-failed" [ngStyle]="{'background-color': 'green'}" *ngIf="this.registerSuccessMessage.length > 0">
-                                <p class="register-success-text">{{registerSuccessMessage}}</p>
-                            </div>
-
-                            <button type="submit" [disabled]="!LoginFormGroup.valid" class="btn btn-primary">Log in</button>
-
-
-
-                        </form>
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
+        <ul class="login-navigation">
+            <li  data-block="#l-register" class="bg-green">Log in</li>
+            <li data-block="#l-forget-password" class="bg-orange">Forgot Password?</li>
+        </ul>
     </div>
 </div>

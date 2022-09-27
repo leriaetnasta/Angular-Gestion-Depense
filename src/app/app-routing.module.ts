@@ -10,14 +10,14 @@ import {SignupComponent} from "./signup/signup.component";
 import {AuthenticationGuard} from "./guard/authentication.guard";
 
 const routes: Routes = [
-    {path : '', redirectTo : "login",pathMatch:"full"},
   {path : 'depenses', component : DepensesComponent,  canActivate: [AuthenticationGuard]},
   {path : 'employes', component : EmployesComponent, canActivate: [AuthenticationGuard]},
   {path : 'deplacements', component : DeplacementsComponent, canActivate: [AuthenticationGuard]},
   {path : 'projets', component : ProjetsComponent, canActivate: [AuthenticationGuard]},
   {path : 'clients', component : ClientsComponent, canActivate: [AuthenticationGuard]},
   {path : 'login', component : LoginComponent},
-  {path : 'sign-up', component : SignupComponent}
+  {path : 'sign-up', component : SignupComponent},
+  {path : '', redirectTo : "/login",pathMatch:"full"},
 
 
 ];
